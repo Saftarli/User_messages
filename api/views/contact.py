@@ -13,9 +13,17 @@ contact_model = contact_namespace.model(
     'Contact', {
         'id': fields.Integer(),
         'owner_id': fields.Integer(),
-        'contact_id': fields.Integer()
+        'contact_username': fields.String()
     }
 )
+creat_contact_model = contact_namespace.model(
+    'Contactcreate', {
+        'contact_username': fields.String()
+    }
+)
+
+
+
 
 @contact_namespace.route('/')
 class ContactGetandCreated(Resource):
@@ -36,34 +44,36 @@ class ContactGetandCreated(Resource):
     
 
     @contact_namespace.expect(contact_model)
-    @contact_namespace.marshal_with(contact_model)
+    @contact_namespace.marshal_with(creat_contact_model)
     @jwt_required()
     def post(self):
         """Create a new contact."""
         tokenden_gelen_username = get_jwt_identity()
         data = request.get_json()
-        contact_id = data.get('contact_id')
+        # contact_id = data.get('contact_id')
+        contact_username = data.get('contact_user')  #"saftarli"
 
         # Mövcud istifadəçini token ilə tapırıq
-        user = User.query.filter_by(username=tokenden_gelen_username).first()
-        if not user:
+        owner = User.query.filter_by(username=tokenden_gelen_username).first() # username = "test10" olan user obyekti qaytardi 
+        if not owner:
             return {"message": "User not found"}, HTTPStatus.UNAUTHORIZED
 
         # Kontaktın mövcudluğunu yoxlayırıq
-        contact_user = User.query.get(contact_id)
+        contact_user = User.query.filter_by(username=contact_username).first() # username = saftarli olan obyekti  qaytaracaq. 
+        print(contact_user, "^%&*&%^&$^%$*&$*&&*^$^&$")
         if not contact_user:
             return {"message": "Contact user does not exist"}, HTTPStatus.NOT_FOUND
 
         # Eyni kontaktın artıq mövcud olub-olmadığını yoxlayırıq
-        existing_contact = Contact.query.filter_by(owner_id=user.id, contact_id=contact_id).first()
+        existing_contact = Contact.query.filter_by(owner_id=owner.id, contact_id=contact_user.id).first()
         if existing_contact:
             return {"message": "Contact already exists"}, HTTPStatus.CONFLICT
         
 
         # Yeni kontakt əlavə edirik
         new_contact = Contact(
-            owner_id=user.id,
-            contact_id=contact_id
+            owner_id=owner.id,
+            contact_id=contact_user.id
         )
         db.session.add(new_contact)
         db.session.commit()

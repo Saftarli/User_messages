@@ -28,7 +28,7 @@ class Contact(db.Model):
 
     id: Mapped[int]= mapped_column(Integer,primary_key=True)
     owner_id: Mapped[int]= mapped_column(Integer,ForeignKey('users.id'), nullable=False)
-    contact_id: Mapped[int]=mapped_column(Integer, ForeignKey('users.id'), nullable=False)
+    contact_id: Mapped[int]=mapped_column(Integer, ForeignKey('users.id'),nullable=False)
     # contact_user: Mapped['User']=relationship('User',backref='added_contacts')
 
     def __repr__(self):
@@ -42,11 +42,13 @@ class Message(db.Model):
     __tablename__ = 'messages'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    sender_id: Mapped[int] = mapped_column(Integer, ForeignKey('user_id', nullable= False))
-    recipent_id: Mapped[int] = mapped_column(Integer, ForeignKey('user_id', nullable= False))
-    datetime: Mapped[dt]= mapped_column(DateTime,default=dt.utcnow)
-    content: Mapped[str] = mapped_column(Text,nullable=False)
-    status: Mapped[str] = mapped_column(String(10), default='Send')
+    sender_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
+    recipent_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
+    timestamp: Mapped[dt] = mapped_column(DateTime, default=dt.utcnow)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default='Send')
+    sender: Mapped["User"] = relationship('User', foreign_keys=[sender_id], backref='messages_sent')
+    recipient: Mapped["User"] = relationship('User', foreign_keys=[recipent_id], backref='messages_received')
 
 
     def __repr__(self):

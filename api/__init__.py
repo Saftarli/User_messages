@@ -8,6 +8,7 @@ from werkzeug.exceptions import NotFound,MethodNotAllowed
 from api.models import User, Contact
 from api.views.auth import auth_namespace
 from api.views.contact import contact_namespace
+from api.views.meesages import messages_namespace
 
 def create_app(config=config_dict['dev']):
     app=Flask(__name__)
@@ -24,6 +25,7 @@ def create_app(config=config_dict['dev']):
     # api.add_namespace()
     api.add_namespace(auth_namespace, path='/auth')
     api.add_namespace(contact_namespace, path='/contacts')
+    api.add_namespace(messages_namespace,path='/messages')
 
     
     # @api.errorhandler(NotFound)
