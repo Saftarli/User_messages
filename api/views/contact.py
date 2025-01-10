@@ -13,7 +13,7 @@ contact_model = contact_namespace.model(
     'Contact', {
         'id': fields.Integer(),
         'owner_id': fields.Integer(),
-        'contact_username': fields.String()
+        'contact_id': fields.Integer()
     }
 )
 creat_contact_model = contact_namespace.model(
@@ -42,6 +42,10 @@ class ContactGetandCreated(Resource):
         # return contacts, HTTPStatus.OK
         return contacts
     
+
+    
+
+
 
     @contact_namespace.expect(contact_model)
     @contact_namespace.marshal_with(creat_contact_model)
@@ -97,7 +101,27 @@ class ContactDeleteandEdit(Resource):
 
         return contact_to_delete, HTTPStatus.OK
     
+    @jwt_required()
+    @contact_namespace.marshal_with(contact_model)
+    def put(self,contact_id):
+        """Update contact"""
 
+        contact_to_update =Contact.get_by_id(contact_id)
+        data = contact_namespace.payload
+        contact_to_update.name = data['name']
+
+        db.session.commit()
+
+
+        return contact_to_update, HTTPStatus.OK
+    
+
+    @contact_namespace.marshal_with(contact_model)
+    def get(self, contact_id):
+
+        contact_detail = Contact.get_by_id(contact_id)
+        
+        return contact_detail, HTTPStatus.OK
 
 
 
@@ -108,11 +132,11 @@ class ContactDeleteandEdit(Resource):
 # Userlər arasında mesajlaşma sistemi
 # -userlər qeydiyyat və login ola bilməlidir(jwt) ok
 # -hər userin hesabında kontaktları olmalıdır.ok
-# -user login olubsa, kontaktlarındakı userlərə msj gondərə bilməlidir. 
-# -user göndərdiyi msj-ı gondərdiyi zamandan 1 dəq sonraya kimi editləyə bilər, əgər 1 dəqiqəni keçibsə editləmə mümkün olmamalıdır
+# -user login olubsa, kontaktlarındakı userlərə msj gondərə bilməlidir. ok
+# -user göndərdiyi msj-ı gondərdiyi zamandan 1 dəq sonraya kimi editləyə bilər, əgər 1 dəqiqəni keçibsə editləmə mümkün olmamalıdır ok 
 # -həmçinin user göndərdiyi msjı göndərdiyi zamandan 1 dəq sonraya kimi silə bilər.(gmaildəki unsend kimi)1 dəqiqəni keçdisə delete mümkün olmamalıdır
 # -user contactına mövcud olan userlərdən kimisə artıra bilər ok
 # -user contactındakı hər hansı öz contactından silə bilər ok
-# -user ona gələn bütün mesajlara baxa bilər
-# -user ona hər hansı bir contactdan gələn mesajlara baxa bilər
-# -user contactındakı mesajları silə bilər
+# -user ona gələn bütün mesajlara baxa bilər ok 
+# -user ona hər hansı bir contactdan gələn mesajlara baxa bilər ok 
+# -user contactındakı mesajları silə bilər ok 

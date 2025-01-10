@@ -1,0 +1,1 @@
+Contact classindaki yoxla metodu yoxlanilmalidir. 

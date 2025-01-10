@@ -16,14 +16,14 @@ class Config:
 class DevConfig(Config):
     DEBUG=config('FLASK_DEBUG', cast=bool)
     # SQLALCHEMY_ECHO=False
-    SQLALCHEMY_DATABASE_URI='postgresql://postgres:Sefterli0506@localhost/flask_mesaj_db'
+    SQLALCHEMY_DATABASE_URI='sqlite:///tehmasib.db'
 
 
 
 class TestConfig(Config):
     TESTING=True
     # SQLALCHEMY_ECHO=False
-    SSQLALCHEMY_DATABASE_URI='postgresql://postgres:Sefterli0506@localhost/test_flask_mesaj_db'
+    SSQLALCHEMY_DATABASE_URI='sqlite:///tehmasib.db'
 
 
 class ProdConfig(Config):

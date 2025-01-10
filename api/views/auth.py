@@ -58,11 +58,11 @@ class Login(Resource):
         data = request.get_json()
 
         email = data.get('email')
-        password = data.get('password')
+        password= data.get('password')
 
         user = User.query.filter_by(email=email).first()
 
-        if (user is not None) and check_password_hash(user.password, password):
+        if (user is not None) and check_password_hash(user.password_hash, password):
             access_token = create_access_token(identity=user.username)
             refresh_token = create_refresh_token(identity=user.username)
 

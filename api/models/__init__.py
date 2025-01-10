@@ -1,62 +1,68 @@
 from api.utils import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer,String,Text,Boolean,DateTime,ForeignKey
-from datetime  import datetime as dt
+from sqlalchemy import Integer, String, Text, ForeignKey, DateTime  
+from datetime import datetime as dt
+
 
 
 class User(db.Model):
     __tablename__ = 'users'
 
-    id: Mapped[int] = mapped_column(Integer,primary_key=True)
-    username: Mapped[str] = mapped_column(String(50),unique=True,nullable=False)
-    email: Mapped[str] = mapped_column(String(45),nullable=False, unique=True)
-    password: Mapped[str] = mapped_column(String(250),nullable=False)
-    # contacts: Mapped["Contact"] = relationship('Contact',backref='owner',lazy=True)
-    # messages_sent: Mapped["Message"]= relationship('Message', backref='sender',lazy=True)
-    # messages_received: Mapped["Message"]= relationship('Message', backref='recipient',lazy=True)
-    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    username: Mapped[str] = mapped_column(String, nullable=False)
+    password_hash: Mapped[str] = mapped_column(String)
+
 
     def __repr__(self):
-        return f"<User {self.username}>"
+        return f"<User {self.username }>"
+    
     
     @classmethod
     def get_by_id(cls,id):
         return cls.query.get_or_404(id)
+    
 
 class Contact(db.Model):
     __tablename__ = 'contacts'
 
-    id: Mapped[int]= mapped_column(Integer,primary_key=True)
-    owner_id: Mapped[int]= mapped_column(Integer,ForeignKey('users.id'), nullable=False)
-    contact_id: Mapped[int]=mapped_column(Integer, ForeignKey('users.id'),nullable=False)
-    # contact_user: Mapped['User']=relationship('User',backref='added_contacts')
-
-    def __repr__(self):
-        return f"<Contact {self.id}>"
+    id: Mapped[int] = mapped_column(Integer,primary_key=True)
+    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    contact_id: Mapped[int] = mapped_column(Integer,ForeignKey('users.id'))
+    name: Mapped[str] = mapped_column(String(30), nullable=True)
     
+
     @classmethod
     def get_by_id(cls,id):
         return cls.query.get_or_404(id)
     
+
+    def __repr__(self):
+        return f"<Contact {self.id}>"
+    
+
+    def vurma(self):
+        return self.id * self.owner_id
+        
+    
+    def yoxla(self,id):
+        return    self.id > 1000
+    
+
+
 class Message(db.Model):
     __tablename__ = 'messages'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    sender_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
-    recipent_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
+    sender_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    recipient_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    content: Mapped[str] = mapped_column(String,nullable=False)
     timestamp: Mapped[dt] = mapped_column(DateTime, default=dt.utcnow)
-    content: Mapped[str] = mapped_column(Text, nullable=False)
-    status: Mapped[str] = mapped_column(String(20), default='Send')
-    sender: Mapped["User"] = relationship('User', foreign_keys=[sender_id], backref='messages_sent')
-    recipient: Mapped["User"] = relationship('User', foreign_keys=[recipent_id], backref='messages_received')
 
 
     def __repr__(self):
-        return f"<Contact {self.id}>"
+        return f"<Message {self.id}>"
     
-    @classmethod
-    def get_by_id(cls,id):
-        return cls.query.get_or_404(id)
 
 
-
+    
