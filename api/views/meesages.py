@@ -18,6 +18,7 @@ message_model = messages_namespace.model('Message', {
     'recipient_id': fields.Integer,
     'timestamp': fields.DateTime,
     'content': fields.String,
+    'body': fields.String
     
 })
 
@@ -103,7 +104,7 @@ class MessageDelete(Resource):
     @jwt_required()
     def patch(self, messages_id):
         username = get_jwt_identity()
-        loggined_user = User.query.filter_by(username= loggined_user).first()
+        loggined_user = User.query.filter_by(username=username).first()
         inbox_messages = Message.query.filter_by(recipient_id = loggined_user.id)
         update_message = Message.query.filter_by(id=messages_id).first()
         if update_message is not None and update_message in inbox_messages:
@@ -120,6 +121,11 @@ class MessageDelete(Resource):
                 response = {
                     "body": "Mesaji deyise bilmersen upss"
                 }
+                return response, HTTPStatus.BAD_REQUEST
+            
+        return {
+            "body": "Ele mesaj movcud deyil"
+        }, HTTPStatus.BAD_REQUEST
 
 
 
